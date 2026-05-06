@@ -45,6 +45,3 @@ jobs:
             Automated sync from Notion (run [#${{ github.run_number }}](${{ github.server_url }}/${{ github.repository }}/actions/runs/${{ github.run_id }})).
 
             Review the diff under `src/content/blog/` and `public/blog-images/` before merging.
-          add-paths: |
-            src/content/blog/**
-            public/blog-images/**
