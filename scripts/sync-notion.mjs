@@ -52,9 +52,8 @@ for (const page of pages) {
   const slug = post.slug || deriveSlug(post.date, post.title);
   const body = await convertPageBody(page.id);
   const { markdown, downloaded } = await localiseImages(body, slug);
-  const cover = post.cover ? await downloadCoverImage(post.cover, slug) : undefined;
 
-  const frontmatter = buildFrontmatter({ ...post, cover });
+  const frontmatter = buildFrontmatter(post);
   const file = `${frontmatter}\n${markdown.trimEnd()}\n`;
   const path = join(POSTS_DIR, `${slug}.md`);
 
@@ -98,7 +97,6 @@ function extractProperties(page) {
     date: p.Date?.date?.start,
     description: plainText(p.Description?.rich_text) || undefined,
     tags: (p.Tags?.multi_select ?? []).map((t) => t.name),
-    cover: firstFileUrl(p.Cover?.files),
     externalUrl: p['External URL']?.url || undefined,
     featured: p.Featured?.checkbox || undefined,
     slug: plainText(p.Slug?.rich_text) || undefined,
@@ -107,12 +105,6 @@ function extractProperties(page) {
 
 function plainText(richText) {
   return (richText ?? []).map((t) => t.plain_text).join('').trim();
-}
-
-function firstFileUrl(files) {
-  if (!files || files.length === 0) return undefined;
-  const f = files[0];
-  return f.type === 'external' ? f.external.url : f.file.url;
 }
 
 function deriveSlug(date, title) {
@@ -171,11 +163,6 @@ async function downloadImage(url, slug) {
   return `${IMAGES_PUBLIC_PREFIX}/${slug}/${filename}`;
 }
 
-async function downloadCoverImage(url, slug) {
-  if (!isNotionHostedUrl(url)) return url; // external URL — leave as-is
-  return (await downloadImage(url, slug)) ?? undefined;
-}
-
 function filenameFromUrl(url) {
   const u = new URL(url);
   const last = u.pathname.split('/').filter(Boolean).pop() || 'image';
@@ -187,7 +174,6 @@ function buildFrontmatter(post) {
   const lines = ['---', `title: ${quote(post.title)}`, `date: ${quote(post.date)}`];
   if (post.description) lines.push(`description: ${quote(post.description)}`);
   if (post.tags?.length) lines.push(`tags: [${post.tags.map(quote).join(', ')}]`);
-  if (post.cover) lines.push(`cover: ${quote(post.cover)}`);
   if (post.externalUrl) lines.push(`externalUrl: ${quote(post.externalUrl)}`);
   if (post.featured) lines.push(`featured: true`);
   lines.push('---');
