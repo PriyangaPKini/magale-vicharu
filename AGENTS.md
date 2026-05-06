@@ -62,6 +62,7 @@ npm install          # install deps (Node ≥ 22.12.0)
 npm run dev          # local dev at http://localhost:4321
 npm run build        # static build to ./dist
 npm run preview      # serve ./dist locally
+npm run sync:notion  # pull blog content from Notion into src/content/blog
 npm run astro …      # raw Astro CLI (e.g. `astro check`)
 ```
 
@@ -78,6 +79,16 @@ npm run astro …      # raw Astro CLI (e.g. `astro check`)
   ```
 - **Never merge or push without explicit user request.**
 - **Never `git add -A` blindly** — review staged files first; `TODO.md` and similar local notes are git-ignored on purpose.
+
+## Content sync (Notion)
+
+- Source of truth: a Notion database — each page with `Status = Done` becomes one markdown post.
+- Script: `scripts/sync-notion.mjs`. Maps Notion properties → frontmatter (see `src/content.config.ts`), converts the body to markdown, and downloads embedded images to `public/blog-images/<slug>/` (Notion file URLs expire).
+- Slug: from the Notion `Slug` property, or falls back to `<date>-<kebab-title>`.
+- Workflow: `.github/workflows/sync-notion.yml` (manual `workflow_dispatch`). Runs the script and opens a `chore/sync-notion` PR via `peter-evans/create-pull-request` if anything changed. Review the diff, then merge → the deploy workflow ships it.
+- Local run: copy `.env.example` (TODO) or set `NOTION_TOKEN` and `NOTION_BLOG_DB_ID`, then `npm run sync:notion`.
+- Required repo secret: `NOTION_TOKEN`. The database ID is committed in the workflow env (it's not sensitive).
+- The sync **does not delete** posts that disappear from Notion. Remove stale `.md` files manually if needed.
 
 ## Deployment
 

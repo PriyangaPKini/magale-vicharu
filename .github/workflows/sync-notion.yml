@@ -1,0 +1,50 @@
+name: Sync from Notion
+
+on:
+  workflow_dispatch:
+
+permissions:
+  contents: write
+  pull-requests: write
+
+env:
+  NOTION_BLOG_DB_ID: 3581056b205180cfa134dad7ce3b5957
+
+concurrency:
+  group: sync-notion
+  cancel-in-progress: false
+
+jobs:
+  sync:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+          cache: 'npm'
+
+      - name: Install dependencies
+        run: npm ci
+
+      - name: Sync content from Notion
+        run: node scripts/sync-notion.mjs
+        env:
+          NOTION_TOKEN: ${{ secrets.NOTION_TOKEN }}
+
+      - name: Open pull request with content changes
+        uses: peter-evans/create-pull-request@v7
+        with:
+          branch: chore/sync-notion
+          delete-branch: true
+          base: main
+          commit-message: "Sync. notion content"
+          title: "Sync. notion content"
+          body: |
+            Automated sync from Notion (run [#${{ github.run_number }}](${{ github.server_url }}/${{ github.repository }}/actions/runs/${{ github.run_id }})).
+
+            Review the diff under `src/content/blog/` and `public/blog-images/` before merging.
+          add-paths: |
+            src/content/blog/**
+            public/blog-images/**
