@@ -95,11 +95,6 @@ npm run astro …      # raw Astro CLI (e.g. `astro check`)
 - **No new dependencies** without a clear reason. Prefer the platform / vanilla over libraries.
 - **Static-only.** No SSR routes, no adapters. If a feature needs a server, host it externally and call it from the client.
 
-## Out-of-scope / parked
-
-- Newsletter (Mailgun/Buttondown/etc.) — intentionally not wired up. Don't re-add a subscribe endpoint without asking.
-- Notion sync, RSS feed, dark mode, analytics — see ideas in personal notes; ask before implementing.
-
 ## Things to watch
 
 - The `site:` URL in `astro.config.mjs` (`https://magale-vicharu.netlify.app`) drives the sitemap. Update it if a custom domain goes live.
