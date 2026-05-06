@@ -85,7 +85,7 @@ npm run astro …      # raw Astro CLI (e.g. `astro check`)
 - Source of truth: a Notion database — each page with `Status = Done` becomes one markdown post.
 - Script: `scripts/sync-notion.mjs`. Maps Notion properties → frontmatter (see `src/content.config.ts`), converts the body to markdown, and downloads embedded images to `public/blog-images/<slug>/` (Notion file URLs expire).
 - Slug: from the Notion `Slug` property, or falls back to `<date>-<kebab-title>`.
-- Workflow: `.github/workflows/sync-notion.yml` (manual `workflow_dispatch`). Runs the script and opens a `chore/sync-notion` PR via `peter-evans/create-pull-request` if anything changed. Review the diff, then merge → the deploy workflow ships it.
+- Workflow: `.github/workflows/sync-notion.yml` (manual `workflow_dispatch`). Runs the script and opens a `chore/sync-notion` PR via `peter-evans/create-pull-request` if anything changed. Review the diff, then merge. Run **Deploy to Netlify** manually afterwards to ship.
 - Local run: copy `.env.example` (TODO) or set `NOTION_TOKEN` and `NOTION_BLOG_DB_ID`, then `npm run sync:notion`.
 - Required repo secret: `NOTION_TOKEN`. The database ID is committed in the workflow env (it's not sensitive).
 - The sync **does not delete** posts that disappear from Notion. Remove stale `.md` files manually if needed.
@@ -93,10 +93,10 @@ npm run astro …      # raw Astro CLI (e.g. `astro check`)
 ## Deployment
 
 - GitHub Actions workflow: `.github/workflows/deploy.yml`.
-- Triggers on push to `main` (i.e., PR merge) and `workflow_dispatch`.
+- **Manual `workflow_dispatch` only** — merging to `main` does not auto-deploy. Trigger from the Actions tab when you're ready to ship.
 - Builds with `npm ci && npm run build`, then `npx netlify-cli deploy --dir=dist --prod`.
 - Required repo secrets: `NETLIFY_AUTH_TOKEN`, `NETLIFY_PROJECT_ID` (mapped to `NETLIFY_SITE_ID` for the CLI).
-- Netlify's built-in continuous deployment is **disabled** to avoid double-deploys.
+- Netlify's built-in continuous deployment is **disabled** — GitHub Actions is the single source of deploys.
 
 ## Conventions
 

@@ -1,15 +1,6 @@
 name: Deploy to Netlify
 
 on:
-  push:
-    branches: [main]
-    paths-ignore:
-      - 'README.md'
-      - 'AGENTS.md'
-      - 'CONTRIBUTING.md'
-      - 'LICENSE'
-      - '.gitignore'
-      - '.vscode/**'
   workflow_dispatch:
 
 concurrency:
