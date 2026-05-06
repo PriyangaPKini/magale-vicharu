@@ -112,6 +112,7 @@ function deriveSlug(date, title) {
     .normalize('NFKD')
     .replace(/[\u0300-\u036f]/g, '')
     .toLowerCase()
+    .replace(/['\u2018\u2019]/g, '') // strip ASCII + curly apostrophes so "don't" → "dont"
     .replace(/[^a-z0-9]+/g, '-')
     .replace(/^-+|-+$/g, '');
   return `${date}-${kebab}`;
