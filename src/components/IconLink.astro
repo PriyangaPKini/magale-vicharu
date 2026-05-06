@@ -1,0 +1,36 @@
+---
+interface Props {
+  href: string;
+  icon: string;
+  label: string;
+  color?: string;
+  className?: string;
+  size?: 20 | 24;
+  target?: string;
+  rel?: string;
+}
+
+const { href, icon, label, color, className = "", size = 20, target, rel } = Astro.props;
+const style = color ? `color: ${color};` : "";
+const attrs: Record<string, string | undefined> = {
+  target,
+  rel,
+};
+
+// Remove undefined values
+Object.keys(attrs).forEach((key) => {
+  if (attrs[key] === undefined) delete attrs[key];
+});
+---
+
+<a
+  {href}
+  class={className}
+  title={label}
+  style={style}
+  {...attrs}
+>
+  <svg width={size} height={size}>
+    <use href={`#${icon}`} />
+  </svg>
+</a>

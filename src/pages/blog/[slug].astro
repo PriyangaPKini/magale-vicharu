@@ -1,0 +1,48 @@
+---
+import BaseLayout from '../../layouts/BaseLayout.astro';
+import { getCollection, render } from 'astro:content';
+
+export async function getStaticPaths() {
+  const posts = (await getCollection('blog'))
+    .sort((a, b) => new Date(b.data.date).getTime() - new Date(a.data.date).getTime());
+  
+  return posts.map((post, index) => ({
+    params: { slug: post.id },
+    props: {
+      post,
+      prev: index < posts.length - 1 ? posts[index + 1] : null,
+      next: index > 0 ? posts[index - 1] : null,
+    },
+  }));
+}
+
+const { post, prev, next } = Astro.props;
+const { Content } = await render(post);
+---
+
+<BaseLayout title={`${post.data.title} — Priyanga P Kini`} description={post.data.description}>
+  <article class="prose">
+    <h1 class="page-title">{post.data.title}</h1>
+    <p class="post-item-date" style="margin-bottom: 2rem;">
+      {new Date(post.data.date).toLocaleDateString('en-US', { year: 'numeric', month: 'long', day: 'numeric' })}
+    </p>
+    <Content />
+  </article>
+
+  <nav class="post-navigation">
+    <div class="nav-prev">
+      {prev ? (
+        <a href={`/blog/${prev.id}`}>← {prev.data.title}</a>
+      ) : (
+        <span></span>
+      )}
+    </div>
+    <div class="nav-next">
+      {next ? (
+        <a href={`/blog/${next.id}`}>{next.data.title} →</a>
+      ) : (
+        <span></span>
+      )}
+    </div>
+  </nav>
+</BaseLayout>

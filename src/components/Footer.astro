@@ -1,0 +1,23 @@
+---
+import IconLink from "./IconLink.astro";
+import { SOCIAL_ITEMS } from "../constants";
+---
+
+<footer class="footer">
+  <div class="footer-container">
+    <div class="footer-social">
+      {SOCIAL_ITEMS.map((item) => (
+        <IconLink
+          href={item.href}
+          icon={item.icon}
+          label={item.label}
+          color={item.color}
+          className="social-link"
+          size={20}
+          target="_blank"
+          rel="noopener noreferrer"
+        />
+      ))}
+    </div>
+  </div>
+</footer>
